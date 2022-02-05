@@ -26,6 +26,29 @@ test('Should create task for user', async() => {
     expect(task.completed).toBe(false)
 })
 
+test('Should not create task with invalid description', async() => {
+    const response = await request(app)
+        .post('/tasks')
+        .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+        .send({
+            description: ''
+        })
+        .expect(400)
+    const task = await Task.findById(response.body._id)
+    expect(task).toBeNull()
+})
+
+test('Should not update task with invalid description', async() => {
+    const response = await request(app)
+        .patch(`/tasks/${taskTwo._id}`)
+        .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+        .send({
+            description: ''
+        })
+        .expect(400)
+    expect(taskTwo.description).not.toEqual('')
+})
+
 test('Should get 2 tasks for user one', async() => {
     const response = await request(app)
         .get('/tasks')
